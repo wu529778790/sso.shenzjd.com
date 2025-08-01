@@ -1,4 +1,4 @@
-import { Strategy as SamlStrategy } from "passport-saml";
+import { Strategy as SamlStrategy } from "@node-saml/passport-saml";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();

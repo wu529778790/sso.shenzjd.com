@@ -32,5 +32,4 @@ export default defineNuxtConfig({
     payloadExtraction: false,
   },
   css: ["~/assets/css/main.css"],
-  modules: ["@nuxtjs/tailwindcss"],
 });

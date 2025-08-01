@@ -14,8 +14,8 @@
 ## 技术栈
 
 - **框架**: Nuxt 4 (Vue 3)
-- **样式**: Tailwind CSS
-- **认证**: passport-saml
+- **样式**: Tailwind CSS 4
+- **认证**: @node-saml/passport-saml
 - **会话**: JWT (jose)
 - **部署**: Cloudflare Pages
 - **类型**: TypeScript
