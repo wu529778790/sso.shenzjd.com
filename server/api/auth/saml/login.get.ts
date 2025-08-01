@@ -1,0 +1,55 @@
+import { Strategy as SamlStrategy } from "passport-saml";
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+
+  // Create SAML strategy
+  const samlStrategy = new SamlStrategy(
+    {
+      callbackUrl:
+        config.samlCallbackUrl ||
+        `${config.public.baseUrl}/api/auth/saml/callback`,
+      entryPoint: config.samlEntryPoint,
+      issuer: config.samlIssuer || config.public.baseUrl,
+      cert: config.samlCert,
+      identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      signatureAlgorithm: "sha256",
+      digestAlgorithm: "sha256",
+      requestIdExpirationPeriodMs: 28800000, // 8 hours
+      cacheProvider: {
+        save: () => {},
+        get: () => null,
+        remove: () => {},
+      },
+    },
+    () => {}
+  );
+
+  try {
+    // Get the SAML login URL
+    const loginUrl = await new Promise((resolve, reject) => {
+      samlStrategy.authenticate(
+        {
+          query: getQuery(event),
+          body: {},
+          get: (header: string) => getHeader(event, header),
+        } as any,
+        {
+          redirect: (url: string) => resolve(url),
+          fail: (message: string) => reject(new Error(message)),
+          success: () => {},
+          error: (err: Error) => reject(err),
+        } as any
+      );
+    });
+
+    // Redirect to SAML provider
+    await sendRedirect(event, loginUrl as string);
+  } catch (error) {
+    console.error("SAML login error:", error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "SAML login failed",
+    });
+  }
+});

@@ -1,0 +1,22 @@
+name = "sso-shenzjd-com"
+compatibility_date = "2024-09-25"
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "npm run build"
+
+# Cloudflare Pages 构建设置
+pages_build_output_dir = ".output/public"
+
+# 环境变量 (在 Cloudflare Dashboard 中设置)
+# SAML_ISSUER
+# SAML_CALLBACK_URL  
+# SAML_LOGIN_URL
+# SAML_LOGOUT_URL
+# SAML_ENTRY_POINT
+# SAML_CERT
+# SESSION_SECRET
+# BASE_URL
+
+[vars]
+NODE_ENV = "production"
