@@ -50,7 +50,8 @@ export default defineEventHandler(async (event) => {
           remove: () => {},
         },
       },
-      () => {}
+      (profile: any, done: Function) => done(null, profile),
+      (err: Error, user: any, info: any) => {}
     );
 
     console.log("SAML策略创建成功，生成登录URL...");
