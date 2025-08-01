@@ -1,5 +1,5 @@
 import { Strategy as SamlStrategy } from "@node-saml/passport-saml";
-import { formatSamlCert } from "../../utils/cert";
+import { formatSamlCert } from "../../../utils/cert";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -45,13 +45,13 @@ export default defineEventHandler(async (event) => {
         digestAlgorithm: "sha256",
         requestIdExpirationPeriodMs: 28800000, // 8 hours
         cacheProvider: {
-          save: () => {},
-          get: () => null,
-          remove: () => {},
+          saveAsync: async () => null,
+          getAsync: async () => null,
+          removeAsync: async () => null,
         },
       },
       (profile: any, done: Function) => done(null, profile),
-      (err: Error, user: any, info: any) => {}
+      (profile: any, done: Function) => done(null, profile)
     );
 
     console.log("SAML策略创建成功，生成登录URL...");

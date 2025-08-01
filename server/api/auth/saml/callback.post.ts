@@ -20,9 +20,9 @@ export default defineEventHandler(async (event) => {
       digestAlgorithm: "sha256",
       requestIdExpirationPeriodMs: 28800000, // 8 hours
       cacheProvider: {
-        save: () => {},
-        get: () => null,
-        remove: () => {},
+        saveAsync: async () => null,
+        getAsync: async () => null,
+        removeAsync: async () => null,
       },
     },
     (profile: any, done: Function) => {
