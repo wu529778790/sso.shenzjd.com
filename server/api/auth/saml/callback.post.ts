@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
         `${config.public.baseUrl}/api/auth/saml/callback`,
       entryPoint: config.samlEntryPoint,
       issuer: config.samlIssuer || config.public.baseUrl,
-      cert: config.samlCert,
+      idpCert: config.samlCert, // 使用 idpCert 而不是 cert
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       signatureAlgorithm: "sha256",
       digestAlgorithm: "sha256",
