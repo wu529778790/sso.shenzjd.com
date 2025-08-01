@@ -14,6 +14,3 @@ pages_build_output_dir = "dist"
 # SAML_CERT
 # SESSION_SECRET
 # BASE_URL
-
-[vars]
-NODE_ENV = "production"
