@@ -1,7 +1,10 @@
 import { Strategy as SamlStrategy } from "@node-saml/passport-saml";
+import { formatSamlCert } from "../../utils/cert";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+
+  const formattedCert = formatSamlCert(config.samlCert);
 
   // Create SAML strategy
   const samlStrategy = new SamlStrategy(
@@ -11,7 +14,7 @@ export default defineEventHandler(async (event) => {
         `${config.public.baseUrl}/api/auth/saml/callback`,
       entryPoint: config.samlEntryPoint,
       issuer: config.samlIssuer || config.public.baseUrl,
-      idpCert: config.samlCert, // 使用 idpCert 而不是 cert
+      idpCert: formattedCert, // 使用格式化后的证书
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       signatureAlgorithm: "sha256",
       digestAlgorithm: "sha256",
