@@ -47,6 +47,13 @@
 
             <div class="text-center text-sm text-gray-500">
               <p>通过 SAML 2.0 协议安全登录</p>
+              <p class="mt-2">
+                <NuxtLink
+                  to="/debug"
+                  class="text-blue-600 hover:text-blue-800 underline">
+                  调试配置
+                </NuxtLink>
+              </p>
             </div>
           </div>
 
