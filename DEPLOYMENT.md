@@ -24,10 +24,10 @@
 
 - **框架预设**: 选择 "无" (None)
 - **构建命令**: `pnpm install --no-frozen-lockfile && pnpm run build`
-- **构建输出目录**: `.output/public`
+- **构建输出目录**: `dist`
 - **根目录**: 留空（使用项目根目录）
 
-**注意**: `wrangler.toml` 文件中的 `[build]` 部分在 Cloudflare Pages 中不被支持，构建命令需要在 Cloudflare Dashboard 中手动配置。
+**注意**: `wrangler.toml` 文件中的 `pages_build_output_dir` 配置已更新为 `dist`，与 Nuxt 构建输出目录保持一致。
 
 ### 4. 环境变量配置
 
@@ -90,6 +90,21 @@ NODE_ENV=production
 1. 查看 Cloudflare Pages 构建日志
 2. 使用浏览器开发者工具检查网络请求
 3. 在 Azure AD 中查看企业应用的登录日志
+
+## 快速部署
+
+使用提供的部署脚本：
+
+```bash
+./deploy.sh
+```
+
+这个脚本会自动：
+
+1. 清理之前的构建
+2. 安装依赖
+3. 构建项目
+4. 验证构建结果
 
 ## 本地测试
 
