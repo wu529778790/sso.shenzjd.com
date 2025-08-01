@@ -27,6 +27,8 @@
 - **构建输出目录**: `.output/public`
 - **根目录**: 留空（使用项目根目录）
 
+**注意**: `wrangler.toml` 文件中的 `[build]` 部分在 Cloudflare Pages 中不被支持，构建命令需要在 Cloudflare Dashboard 中手动配置。
+
 ### 4. 环境变量配置
 
 在 Cloudflare Pages 项目设置中添加以下环境变量：
