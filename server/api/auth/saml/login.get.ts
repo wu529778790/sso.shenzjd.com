@@ -7,6 +7,18 @@ export default defineEventHandler(async (event) => {
   console.log("=== SAML登录API开始执行 ===");
   console.log("请求URL:", getRequestURL(event).toString());
   console.log("请求方法:", getMethod(event));
+  
+  // 添加Cloudflare兼容性检查
+  const userAgent = getHeader(event, "user-agent") || "";
+  const cfRay = getHeader(event, "cf-ray");
+  const cfConnectingIp = getHeader(event, "cf-connecting-ip");
+  
+  console.log("Cloudflare信息:", {
+    userAgent: userAgent.substring(0, 100) + "...",
+    cfRay,
+    cfConnectingIp,
+    isCloudflare: !!cfRay
+  });
 
   // 检查必要的环境变量
   const missingVars = [];
@@ -74,8 +86,8 @@ SAML配置不完整，请在Cloudflare Pages中设置以下环境变量：
       issuer: config.samlIssuer || config.public.baseUrl,
       idpCert: formattedCert,
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-      signatureAlgorithm: "sha256",
-      digestAlgorithm: "sha256",
+      signatureAlgorithm: "sha256" as const,
+      digestAlgorithm: "sha256" as const,
       requestIdExpirationPeriodMs: 28800000, // 8 hours
       acceptedClockSkewMs: 5000, // 5秒时钟偏差容忍
       // validateInResponseTo: false, // 为了简化，暂时禁用（注释掉以避免类型错误）
@@ -169,7 +181,30 @@ SAML配置不完整，请在Cloudflare Pages中设置以下环境变量：
       throw new Error("登录URL必须使用HTTPS协议");
     }
 
-    // Redirect to SAML provider
+    // 检查是否在Cloudflare环境中
+    const cfRay = getHeader(event, "cf-ray");
+    const isCloudflare = !!cfRay;
+    
+    if (isCloudflare) {
+      console.log("Cloudflare环境检测到，返回JSON响应而不是重定向");
+      return {
+        success: true,
+        redirectUrl: loginUrl,
+        isCloudflare: true,
+        message: "请在浏览器中访问以下URL进行登录",
+        instructions: [
+          "1. 复制下面的redirectUrl",
+          "2. 在新标签页中打开",
+          "3. 完成Microsoft登录",
+          "4. 返回应用程序"
+        ],
+        cfRay,
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    // 非Cloudflare环境，正常重定向
+    console.log("非Cloudflare环境，执行重定向");
     await sendRedirect(event, loginUrl);
   } catch (error) {
     console.error("❌ SAML登录过程发生错误:");
@@ -206,6 +241,9 @@ SAML配置不完整，请在Cloudflare Pages中设置以下环境变量：
       } else if (msg.includes("network") || msg.includes("fetch")) {
         errorMessage = "网络连接错误。请检查Microsoft Entra ID服务是否可访问。";
         statusCode = 503;
+      } else if (msg.includes("cloudflare") || msg.includes("cf-")) {
+        errorMessage = "Cloudflare拦截了请求。请检查Cloudflare Pages的安全设置。";
+        statusCode = 403;
       } else {
         errorMessage = `SAML登录失败: ${error.message}`;
       }

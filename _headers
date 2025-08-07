@@ -1,0 +1,21 @@
+# Cloudflare Pages Headers Configuration
+# 允许SAML API正常工作
+
+/api/auth/saml/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  # 禁用Cloudflare的安全检查，允许SAML重定向
+  CF-Cache-Status: BYPASS
+
+/api/debug/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  # 允许调试API访问
+  CF-Cache-Status: BYPASS
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

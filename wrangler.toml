@@ -1,3 +1,25 @@
 name = "sso-shenzjd-com"
 compatibility_date = "2024-09-25"
 compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "sso-shenzjd-com"
+
+# 允许SAML API正常工作
+[env.production.vars]
+NODE_ENV = "production"
+
+# 安全设置
+[env.production.security]
+# 允许SAML重定向
+allow_redirects = true
+
+# 中间件配置
+[env.production.middleware]
+# 允许API路由
+allowed_routes = ["/api/*"]
+
+# 缓存设置
+[env.production.cache]
+# 禁用API缓存
+api_cache = false

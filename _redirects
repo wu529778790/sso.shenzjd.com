@@ -1,0 +1,18 @@
+# Cloudflare Pages Redirects Configuration
+# 确保API路由正常工作
+
+# 允许SAML API重定向
+/api/auth/saml/login 200
+/api/auth/saml/callback 200
+/api/auth/saml/logout 200
+
+# 允许调试API
+/api/debug/* 200
+
+# 其他API路由
+/api/* 200
+
+# 静态资源
+/_nuxt/* 200
+/favicon.ico 200
+/robots.txt 200
