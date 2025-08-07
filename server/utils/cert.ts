@@ -18,5 +18,5 @@ export function formatSamlCert(cert: string): string {
     "-----BEGIN CERTIFICATE-----",
     ...chunks,
     "-----END CERTIFICATE-----",
-  ].join("\\n");
+  ].join("\n");
 }

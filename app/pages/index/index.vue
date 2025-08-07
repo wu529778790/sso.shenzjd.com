@@ -31,6 +31,13 @@
             <p class="text-gray-600">使用您的 Microsoft 账户通过 SAML 登录</p>
           </div>
 
+          <!-- 登出成功消息 -->
+          <div
+            v-if="showLogoutMessage"
+            class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+            <p class="text-green-800 text-sm text-center">✅ 已成功登出</p>
+          </div>
+
           <div v-if="!isLoading">
             <button
               @click="login"
@@ -92,6 +99,19 @@
 
 <script setup>
 const isLoading = ref(false);
+const showLogoutMessage = ref(false);
+
+// 检查是否有登出成功参数
+onMounted(() => {
+  const route = useRoute();
+  if (route.query.logout === "success") {
+    showLogoutMessage.value = true;
+    // 3秒后隐藏消息
+    setTimeout(() => {
+      showLogoutMessage.value = false;
+    }, 3000);
+  }
+});
 
 const login = async () => {
   isLoading.value = true;
