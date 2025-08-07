@@ -116,7 +116,8 @@ onMounted(() => {
 const login = async () => {
   isLoading.value = true;
   try {
-    await navigateTo("/api/auth/saml/login");
+    // 直接跳转到登录API，这会触发重定向到Microsoft登录页面
+    window.location.href = "/api/auth/saml/login";
   } catch (error) {
     console.error("Login failed:", error);
     isLoading.value = false;

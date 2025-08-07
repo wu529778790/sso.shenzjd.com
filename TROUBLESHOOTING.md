@@ -1,95 +1,161 @@
-# SAML SSO 故障排除指南
+# 故障排除指南
 
-## 问题：点击登录按钮跳转到404页面
+## 常见问题及解决方案
 
-### 可能的原因和解决方案
+### 1. 404 错误 - 页面不存在
 
-#### 1. 环境变量配置问题
+**症状**: 访问任何页面都返回 404 错误
 
-最常见的问题是SAML相关的环境变量没有正确配置。请确保在Cloudflare Pages中设置了以下环境变量：
+**可能原因**:
+
+- Cloudflare Pages 部署失败
+- 路由配置问题
+- 构建输出目录错误
+
+**解决方案**:
+
+1. 检查 Cloudflare Pages 部署状态
+2. 确认构建成功生成了 `.nuxt` 目录
+3. 检查 `_routes.json` 配置是否正确
+4. 重新部署项目
+
+### 2. 500 错误 - 服务器内部错误
+
+**症状**: API 调用返回 500 错误
+
+**可能原因**:
+
+- 环境变量未配置
+- SAML 配置错误
+- 代码错误
+
+**解决方案**:
+
+1. 访问 `/debug` 页面检查环境变量状态
+2. 检查 Cloudflare Pages 函数日志
+3. 测试基础 API: `/api/test`
+4. 检查 SAML 配置是否正确
+
+### 3. 登录按钮跳转到 404
+
+**症状**: 点击"Microsoft 登录"按钮后跳转到 404 页面
+
+**可能原因**:
+
+- API 路径错误
+- 环境变量未配置
+- SAML 配置不完整
+
+**解决方案**:
+
+1. 检查 `/api/auth/saml/login` 路径是否正确
+2. 访问 `/debug` 页面测试简化登录 API
+3. 确认所有必需的环境变量已设置
+4. 检查 Microsoft Entra ID 配置
+
+### 4. 调试页面显示"未设置"环境变量
+
+**症状**: 调试页面显示某些环境变量为"未设置"
+
+**解决方案**:
+
+1. 在 Cloudflare Pages 项目设置中添加环境变量
+2. 参考 `SAML_CONFIG_GUIDE.md` 获取正确的配置值
+3. 重新部署项目
+4. 清除浏览器缓存后重新访问
+
+### 5. SAML 认证失败
+
+**症状**: 登录过程中出现 SAML 认证错误
+
+**可能原因**:
+
+- 证书配置错误
+- 回调 URL 不匹配
+- Microsoft Entra ID 配置问题
+
+**解决方案**:
+
+1. 检查 SAML 证书格式是否正确
+2. 确认回调 URL 与 Microsoft Entra ID 配置匹配
+3. 验证 Microsoft Entra ID 应用程序配置
+4. 检查用户是否已分配到应用程序
+
+## 调试步骤
+
+### 步骤 1: 检查基础功能
 
 ```bash
-# SAML 基础配置
-SAML_ISSUER=https://sso.shenzjd.com
-SAML_CALLBACK_URL=https://sso.shenzjd.com/api/auth/saml/callback
-SAML_LOGIN_URL=https://sso.shenzjd.com/api/auth/saml/login
-SAML_LOGOUT_URL=https://sso.shenzjd.com/api/auth/saml/logout
-
-# Microsoft Entra ID 配置
-SAML_ENTRY_POINT=https://login.microsoftonline.com/你的租户ID/saml2
-SAML_CERT=-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----
-
-# 会话密钥 (生成一个安全的随机字符串)
-SESSION_SECRET=your-secure-random-session-secret-minimum-32-characters
-
-# 应用配置
-BASE_URL=https://sso.shenzjd.com
-NODE_ENV=production
+# 访问基础测试 API
+curl https://sso.shenzjd.com/api/test
 ```
 
-#### 2. 检查配置
+### 步骤 2: 检查环境变量
 
-访问 `/debug` 页面来检查环境变量是否正确设置。
+1. 访问 `/debug` 页面
+2. 点击"测试基础 API"按钮
+3. 检查环境变量状态
 
-#### 3. Microsoft Entra ID 配置
+### 步骤 3: 测试简化登录 API
 
-确保在Microsoft Entra ID中正确配置了SAML应用：
+1. 在调试页面点击"测试简化登录 API"
+2. 查看返回的配置信息
+3. 确认缺少哪些环境变量
 
-1. **标识符 (Entity ID)**: `https://sso.shenzjd.com`
-2. **回复 URL**: `https://sso.shenzjd.com/api/auth/saml/callback`
-3. **登录 URL**: `https://sso.shenzjd.com/api/auth/saml/login`
-4. **注销 URL**: `https://sso.shenzjd.com/api/auth/saml/logout`
+### 步骤 4: 检查 Cloudflare Pages 日志
 
-#### 4. 证书配置
+1. 登录 Cloudflare Dashboard
+2. 进入 Pages 项目
+3. 查看 Functions 日志
+4. 查找错误信息
 
-确保SAML_CERT环境变量包含完整的X.509证书，包括：
+## 环境变量检查清单
 
-- `-----BEGIN CERTIFICATE-----`
-- 证书内容
-- `-----END CERTIFICATE-----`
+确保以下环境变量已正确设置：
 
-#### 5. Cloudflare Pages 限制
+- [ ] `BASE_URL` - 应用程序基础 URL
+- [ ] `SAML_ISSUER` - SAML 发行者标识符
+- [ ] `SAML_ENTRY_POINT` - Microsoft Entra ID 登录 URL
+- [ ] `SAML_CERT` - Microsoft Entra ID 证书
+- [ ] `SESSION_SECRET` - 会话加密密钥
+- [ ] `SAML_CALLBACK_URL` - 回调 URL（可选）
+- [ ] `SAML_LOGIN_URL` - 登录 URL（可选）
+- [ ] `SAML_LOGOUT_URL` - 登出 URL（可选）
 
-Cloudflare Pages有一些限制可能影响SAML功能：
+## 常见错误消息
 
-- 某些Node.js模块可能不兼容
-- 网络请求可能受到限制
-- 文件系统访问受限
+### "SAML配置不完整"
 
-### 调试步骤
+- 检查所有必需的环境变量是否已设置
+- 参考 `SAML_CONFIG_GUIDE.md` 进行配置
 
-1. **访问调试页面**: 访问 `/debug` 页面检查环境变量
-2. **查看构建日志**: 在Cloudflare Pages中查看构建日志
-3. **检查网络请求**: 使用浏览器开发者工具检查网络请求
-4. **查看控制台错误**: 检查浏览器控制台的错误信息
+### "证书验证失败"
 
-### 常见错误
+- 确保证书格式正确（包含 BEGIN 和 END 行）
+- 确保证书是从 Microsoft Entra ID 下载的最新版本
 
-#### 错误：Missing required environment variables
+### "回调URL不匹配"
 
-**解决方案**: 确保所有必需的环境变量都已设置
+- 确保 Microsoft Entra ID 中的回复 URL 与环境变量中的 URL 完全匹配
+- 检查是否使用了正确的协议（https）
 
-#### 错误：SAML login failed
+### "用户认证失败"
 
-**解决方案**:
+- 确保用户已分配到该企业应用程序
+- 检查用户属性映射是否正确
 
-- 检查Microsoft Entra ID配置
-- 验证证书格式
-- 确认URL配置正确
+## 获取帮助
 
-#### 错误：404 Not Found
+如果以上步骤无法解决问题：
 
-**解决方案**:
+1. 检查 Cloudflare Pages 函数日志获取详细错误信息
+2. 查看浏览器开发者工具的网络和控制台标签
+3. 参考 `SAML_CONFIG_GUIDE.md` 重新配置
+4. 确保 Microsoft Entra ID 配置正确
 
-- 检查Cloudflare Pages路由配置
-- 确认API路由文件存在
-- 验证构建输出正确
+## 有用的调试工具
 
-### 联系支持
-
-如果问题仍然存在，请：
-
-1. 收集调试页面的输出
-2. 提供Cloudflare Pages构建日志
-3. 提供浏览器控制台错误信息
-4. 检查Microsoft Entra ID应用配置截图
+- **调试页面**: `/debug` - 检查配置状态和测试 API
+- **基础测试 API**: `/api/test` - 验证基本功能
+- **简化登录 API**: `/api/auth/saml/login-simple` - 检查 SAML 配置
+- **环境变量 API**: `/api/debug/env` - 查看环境变量状态
