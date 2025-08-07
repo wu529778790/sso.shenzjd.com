@@ -30,6 +30,18 @@
             {{ isTesting ? "测试中..." : "测试基础 API" }}
           </button>
           <button
+            @click="testBasicLoginApi"
+            class="btn btn-secondary"
+            :disabled="isTesting">
+            {{ isTesting ? "测试中..." : "测试基础登录 API" }}
+          </button>
+          <button
+            @click="testSafeLoginApi"
+            class="btn btn-secondary"
+            :disabled="isTesting">
+            {{ isTesting ? "测试中..." : "测试安全登录 API" }}
+          </button>
+          <button
             @click="testSimpleLoginApi"
             class="btn btn-secondary"
             :disabled="isTesting">
@@ -99,6 +111,34 @@ const testBasicApi = async () => {
   } catch (error) {
     testResults.value = `基础 API 错误: ${error.message}`;
     errors.value.push(`基础 API 测试失败: ${error.message}`);
+  } finally {
+    isTesting.value = false;
+  }
+};
+
+// 测试基础登录 API
+const testBasicLoginApi = async () => {
+  isTesting.value = true;
+  try {
+    const response = await $fetch("/api/auth/saml/login-basic");
+    testResults.value = JSON.stringify(response, null, 2);
+  } catch (error) {
+    testResults.value = `基础登录 API 错误: ${error.message}`;
+    errors.value.push(`基础登录 API 测试失败: ${error.message}`);
+  } finally {
+    isTesting.value = false;
+  }
+};
+
+// 测试安全登录 API
+const testSafeLoginApi = async () => {
+  isTesting.value = true;
+  try {
+    const response = await $fetch("/api/auth/saml/login-safe");
+    testResults.value = JSON.stringify(response, null, 2);
+  } catch (error) {
+    testResults.value = `安全登录 API 错误: ${error.message}`;
+    errors.value.push(`安全登录 API 测试失败: ${error.message}`);
   } finally {
     isTesting.value = false;
   }
